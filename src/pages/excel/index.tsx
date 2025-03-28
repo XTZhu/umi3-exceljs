@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Table } from 'antd';
-import { exportExcelWithWorker } from '../worker/workerUtils.js';
+import { exportExcelWithWorker } from '../worker/workerUtils';
 
 const columns = [
   {
