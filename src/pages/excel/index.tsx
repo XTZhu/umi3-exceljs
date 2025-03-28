@@ -1,10 +1,13 @@
 import React from 'react';
 import { Button, Table } from 'antd';
-import { exportExcelWithWorker } from '../worker/workerUtils';
+import ExcelJS from 'exceljs';
+import { jsxToString } from './utils';
+// import { createExcelWorker } from '../worker/workerUtils';
+// import SampleWorker from '@/pages/worker/sample.worker.js';
 
 const columns = [
   {
-    title: 'Name',
+    title: <span style={{ color: 'red' }}>Name</span>,
     dataIndex: 'name',
     key: 'name',
   },
@@ -42,14 +45,42 @@ const data = [
 ];
 
 const ExcelTable: React.FC = () => {
-  const exportExcel = () => {
-    exportExcelWithWorker(columns, data, 'export.xlsx');
+  const exportExcel = async () => {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet('Sheet1');
+      // 添加表头
+      sheet.columns = columns.map((col) => ({
+        header: jsxToString(col.title),
+        key: col.dataIndex,
+      }));
+
+      // 根据 data 填充 Excel 数据
+      data.forEach((row) => {
+        sheet.addRow(row);
+      });
+
+      // 生成 Excel 文件并发送回主线程
+      const buffer = await workbook.xlsx.writeBuffer();
+      // download file
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'export.xlsx';
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export Excel:', error);
+    }
   };
 
   return (
     <div style={{ width: '80%', margin: '0 auto', backgroundColor: '#777' }}>
       <Table columns={columns} dataSource={data} />
-      <Button onClick={exportExcel}>Export</Button>
+      <Button onClick={() => exportExcel()}>Export</Button>
     </div>
   );
 };

@@ -1,29 +1,34 @@
-import ExcelJS from 'exceljs';
+// import excelWorker from '@/pages/worker/excel.worker';
 
-export const exportExcelWithWorker = async (
-  columns: Array<{ title: string; dataIndex: string; key: string }>,
-  data: Array<Record<string, any>>,
-  fileName: string,
-): Promise<void> => {
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Sheet1');
+// export const createExcelWorker = (
+//   columns: any[],
+//   data: any[],
+// ): Promise<Blob> => {
+//   return new Promise((resolve, reject) => {
+//     const worker = new excelWorker();
 
-  // 添加列
-  worksheet.columns = columns.map((col) => ({
-    header: col.title,
-    key: col.dataIndex,
-  }));
+//     // 向 worker 发送数据
+//     worker.postMessage({ columns, data });
 
-  // 添加数据
-  data.forEach((row) => {
-    worksheet.addRow(row);
-  });
+//     // 监听 worker 的消息
+//     worker.onmessage = (event) => {
+//       const { data } = event;
+//       if (data.error) {
+//         reject(new Error(data.error));
+//       } else {
+//         resolve(
+//           new Blob([data], {
+//             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+//           }),
+//         );
+//       }
+//       worker.terminate();
+//     };
 
-  // 导出文件
-  const buffer = await workbook.xlsx.writeBuffer();
-  const blob = new Blob([buffer], { type: 'application/octet-stream' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = fileName;
-  link.click();
-};
+//     // 监听 worker 的错误
+//     worker.onerror = (error) => {
+//       reject(error);
+//       worker.terminate();
+//     };
+//   });
+// };

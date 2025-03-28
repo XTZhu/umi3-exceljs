@@ -10,11 +10,21 @@ export default defineConfig({
   sass: {},
   routes,
   chainWebpack(config) {
-    config.module
-      .rule('worker')
-      .test(/\.worker\.ts$/)
-      .use('worker-loader')
-      .loader('worker-loader');
+    // config.merge({
+    //   module: {
+    //     rules: [
+    //       {
+    //         test: /\.worker\.js$/,
+    //         include: [/src\/worker/], // 仅匹配 src/worker 目录下的文件
+    //         use: [
+    //           {
+    //             loader: 'worker-loader',
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   },
+    // });
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
