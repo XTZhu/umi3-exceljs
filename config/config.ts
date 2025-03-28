@@ -9,5 +9,14 @@ export default defineConfig({
   mfsu: {},
   sass: {},
   routes,
-  chainWebpack(config, { webpack }) {},
+  chainWebpack(config) {
+    config.module
+      .rule('worker')
+      .test(/\.worker\.ts$/)
+      .use('worker-loader')
+      .loader('worker-loader');
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+  },
 });
