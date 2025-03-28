@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Table } from 'antd';
-import EXSL from 'exceljs';
+import { exportExcelWithWorker } from '../worker/workerUtils.js';
 
 const columns = [
   {
@@ -42,30 +42,10 @@ const data = [
 ];
 
 const ExcelTable: React.FC = () => {
-  const workbook = new EXSL.Workbook();
-
   const exportExcel = () => {
-    const worksheet = workbook.addWorksheet('Sheet1');
-    worksheet.columns = columns.map((column) => ({
-      header: column.title,
-      key: column.dataIndex,
-      width: 20,
-    }));
-    data.forEach((record) => {
-      worksheet.addRow(record);
-    });
-    downloadExcel();
+    exportExcelWithWorker(columns, data, 'export.xlsx');
   };
 
-  const downloadExcel = () => {
-    workbook.xlsx.writeBuffer().then((buffer) => {
-      const blob = new Blob([buffer], { type: 'application/octet-stream' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'export.xlsx';
-      a.click();
-    });
-  };
   return (
     <div style={{ width: '80%', margin: '0 auto', backgroundColor: '#777' }}>
       <Table columns={columns} dataSource={data} />
