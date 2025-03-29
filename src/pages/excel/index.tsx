@@ -45,6 +45,7 @@ const data = [
 ];
 
 const ExcelTable: React.FC = () => {
+  // 导出表格
   const exportExcel = async () => {
     try {
       const workbook = new ExcelJS.Workbook();
@@ -59,22 +60,23 @@ const ExcelTable: React.FC = () => {
       data.forEach((row) => {
         sheet.addRow(row);
       });
-
-      // 生成 Excel 文件并发送回主线程
-      const buffer = await workbook.xlsx.writeBuffer();
-      // download file
-      const blob = new Blob([buffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'export.xlsx';
-      link.click();
-      window.URL.revokeObjectURL(url);
+      downloadExcel(workbook);
     } catch (error) {
       console.error('Failed to export Excel:', error);
     }
+  };
+
+  const downloadExcel = async (workbook: ExcelJS.Workbook) => {
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'export.xlsx';
+    link.click();
+    window.URL.revokeObjectURL(url);
   };
 
   return (
