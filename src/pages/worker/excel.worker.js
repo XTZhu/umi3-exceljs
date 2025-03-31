@@ -1,10 +1,11 @@
+import { jsxToString } from './workerUtils';
+
 // 使用 web worker 处理 Excel 下载逻辑
 onmessage = async (event) => {
   const {
     data: { payload, action },
   } = event;
 
-  const { columns = [], data } = payload;
   if (action !== 'exportExcel') {
     return;
   }
@@ -13,16 +14,20 @@ onmessage = async (event) => {
     // 引入 exceljs 库
     const ExcelJS = await import('exceljs');
     const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Sheet1');
 
-    sheet.columns = columns.map((col) => ({
-      header: col.title,
-      key: col.dataIndex,
-    }));
-
-    // 根据 data 填充 Excel 数据
-    data.forEach((row) => {
-      sheet.addRow(row);
+    payload.map((item) => {
+      const sheet = workbook.addWorksheet(item.title);
+      item.data.map((dataItem) => {
+        sheet.addRow(dataItem);
+      });
+      sheet.columns = item.columns.map((col) => ({
+        header: jsxToString(col.header),
+        key: col.dataIndex,
+      }));
+      // 根据 data 填充 Excel 数据
+      item.data.forEach((row) => {
+        sheet.addRow(row);
+      });
     });
 
     // 生成 Excel 文件并发送回主线程
@@ -30,6 +35,11 @@ onmessage = async (event) => {
 
     self.postMessage(buffer);
   } catch (error) {
+    console.log(
+      '%c [ error ]-50',
+      'font-size:13px; background:#adcc6c; color:#f1ffb0;',
+      error,
+    );
     self.postMessage({ error });
   }
 };

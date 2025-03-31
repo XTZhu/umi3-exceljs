@@ -5,6 +5,7 @@ import { jsxToString } from './utils';
 // import { createExcelWorker } from '../worker/workerUtils';
 // import SampleWorker from '@/pages/worker/sample.worker.js';
 import ExcelWorker from 'worker-loader!@/pages/worker/excel.worker.js';
+import { mockColumns } from './mockdata';
 
 const columns = [
   {
@@ -49,27 +50,21 @@ const ExcelTable: React.FC = () => {
   const exportExcel = async () => {
     try {
       // 添加表头
-      const workerColumns = columns.map((col) => ({
-        title: jsxToString(col.title),
-        dataIndex: col.dataIndex,
-        key: col.key,
-        width: 100,
-        style: {
-          font: {
-            bold: true,
-            color: { rgb: 'FF0000' },
-          },
-        },
-      }));
-
       const worker = new ExcelWorker();
+
+      const renderFormattedColumns = mockColumns.sheetArray.map((column) => {
+        return {
+          ...column,
+          columns: column.columns.map((col) => ({
+            ...col,
+            header: jsxToString(col.header),
+          })),
+        };
+      });
 
       worker.postMessage({
         action: 'exportExcel',
-        payload: {
-          columns: workerColumns,
-          data,
-        },
+        payload: renderFormattedColumns,
       });
 
       worker.onmessage = (event) => {
@@ -94,7 +89,8 @@ const ExcelTable: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'export.xlsx';
+    const timestamp = new Date().toISOString().replace(/[:.-]/g, '_');
+    a.download = `${mockColumns.excelTitle}_${timestamp}.xlsx`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
