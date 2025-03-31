@@ -4,7 +4,7 @@ import ExcelJS from 'exceljs';
 import { jsxToString } from './utils';
 // import { createExcelWorker } from '../worker/workerUtils';
 // import SampleWorker from '@/pages/worker/sample.worker.js';
-import ExcelWorker from 'worker-loader!@/pages/worker/excel.worker.js';
+import ExcelWorker from 'worker-loader!@/pages/worker/excel.worker';
 import { mockColumns } from './mockdata';
 
 const columns = [
@@ -57,7 +57,7 @@ const ExcelTable: React.FC = () => {
           ...column,
           columns: column.columns.map((col) => ({
             ...col,
-            header: jsxToString(col.header),
+            title: jsxToString(col.title),
           })),
         };
       });

@@ -4,8 +4,9 @@ import ExcelJS from 'exceljs';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 export interface HeaderType {
-  title: string;
+  header?: string;
   dataIndex: string;
+  title?: string;
   width?: number;
 }
 
@@ -108,7 +109,7 @@ export const convertAntdColumnsToExcel = <T extends Record<string, any>>(
     .map((col) => ({
       header: col.title as string,
       key: col.dataIndex as string,
-      width: (col.width as number) / 10 || 20,
+      width: (col.width as number) * 2 || 40,
     }));
 
   // 转换数据，处理 render 函数的结果

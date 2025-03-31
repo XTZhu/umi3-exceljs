@@ -14,7 +14,11 @@ export default defineConfig({
       .rule('worker')
       .test(/\.worker\.(js|ts)$/)
       .use('worker-loader')
-      .loader('worker-loader');
+      .loader('worker-loader')
+      .end()
+      .use('ts-loader')
+      .loader('ts-loader')
+      .end();
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
