@@ -4,6 +4,8 @@ import ExcelJS from 'exceljs';
 import { jsxToString } from './utils';
 // import { createExcelWorker } from '../worker/workerUtils';
 // import SampleWorker from '@/pages/worker/sample.worker.js';
+import ExcelWorker from 'worker-loader!@/pages/worker/excel.worker';
+import { mockColumns } from './mockdata';
 
 const columns = [
   {
@@ -48,35 +50,52 @@ const ExcelTable: React.FC = () => {
   // 导出表格
   const exportExcel = async () => {
     try {
-      const workbook = new ExcelJS.Workbook();
-      const sheet = workbook.addWorksheet('Sheet1');
       // 添加表头
-      sheet.columns = columns.map((col) => ({
-        header: jsxToString(col.title),
-        key: col.dataIndex,
-      }));
+      const worker = new ExcelWorker();
 
-      // 根据 data 填充 Excel 数据
-      data.forEach((row) => {
-        sheet.addRow(row);
+      const renderFormattedColumns = mockColumns.sheetArray.map((column) => {
+        return {
+          ...column,
+          columns: column.columns.map((col) => ({
+            ...col,
+            title: jsxToString(col.title),
+          })),
+        };
       });
-      downloadExcel(workbook);
+
+      worker.postMessage({
+        action: 'exportExcel',
+        payload: renderFormattedColumns,
+      });
+
+      worker.onmessage = (event) => {
+        const { buffer } = event.data;
+        if (buffer) {
+          downloadExcel(buffer);
+        }
+        worker.terminate();
+      };
+
+      worker.onerror = (error) => {
+        console.error('Worker error:', error);
+        worker.terminate();
+      };
     } catch (error) {
       console.error('Failed to export Excel:', error);
     }
   };
 
-  const downloadExcel = async (workbook: ExcelJS.Workbook) => {
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'export.xlsx';
-    link.click();
-    window.URL.revokeObjectURL(url);
+  const downloadExcel = (buffer: Buffer) => {
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const timestamp = new Date().toISOString().replace(/[:.-]/g, '_');
+    a.download = `${mockColumns.excelTitle}_${timestamp}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
