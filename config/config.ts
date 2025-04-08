@@ -7,20 +7,10 @@ import routes from './routes';
 // @ts-ignore
 export default defineConfig({
   mfsu: {},
-  sass: {},
+  nodeModulesTransform: {
+    type: 'none',
+  },
+
+  fastRefresh: {},
   routes,
-  chainWebpack(config) {
-    config.module
-      .rule('worker')
-      .test(/\.worker\.(js|ts)$/)
-      .use('worker-loader')
-      .loader('worker-loader')
-      .end()
-      .use('ts-loader')
-      .loader('ts-loader')
-      .end();
-  },
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
-  },
 });

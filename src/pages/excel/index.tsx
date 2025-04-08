@@ -4,7 +4,7 @@ import ExcelJS from 'exceljs';
 import { jsxToString } from './utils';
 // import { createExcelWorker } from '../worker/workerUtils';
 // import SampleWorker from '@/pages/worker/sample.worker.js';
-import ExcelWorker from 'worker-loader!@/pages/worker/excel.worker';
+// import ExcelWorker from 'worker-loader!@/pages/worker/excel.worker';
 import { mockColumns } from './mockdata';
 
 const columns = [
@@ -47,42 +47,42 @@ const data = [
 ];
 
 const ExcelTable: React.FC = () => {
-  const exportExcel = async () => {
-    try {
-      // 添加表头
-      const worker = new ExcelWorker();
+  // const exportExcel = async () => {
+  //   try {
+  //     // 添加表头
+  //     const worker = new ExcelWorker();
 
-      const renderFormattedColumns = mockColumns.sheetArray.map((column) => {
-        return {
-          ...column,
-          columns: column.columns.map((col) => ({
-            ...col,
-            title: jsxToString(col.title),
-          })),
-        };
-      });
+  //     const renderFormattedColumns = mockColumns.sheetArray.map((column) => {
+  //       return {
+  //         ...column,
+  //         columns: column.columns.map((col) => ({
+  //           ...col,
+  //           title: jsxToString(col.title),
+  //         })),
+  //       };
+  //     });
 
-      worker.postMessage({
-        action: 'exportExcel',
-        payload: renderFormattedColumns,
-      });
+  //     worker.postMessage({
+  //       action: 'exportExcel',
+  //       payload: renderFormattedColumns,
+  //     });
 
-      worker.onmessage = (event) => {
-        const { buffer } = event.data;
-        if (buffer) {
-          downloadExcel(buffer);
-        }
-        worker.terminate();
-      };
+  //     worker.onmessage = (event) => {
+  //       const { buffer } = event.data;
+  //       if (buffer) {
+  //         downloadExcel(buffer);
+  //       }
+  //       worker.terminate();
+  //     };
 
-      worker.onerror = (error) => {
-        console.error('Worker error:', error);
-        worker.terminate();
-      };
-    } catch (error) {
-      console.error('Failed to export Excel:', error);
-    }
-  };
+  //     worker.onerror = (error) => {
+  //       console.error('Worker error:', error);
+  //       worker.terminate();
+  //     };
+  //   } catch (error) {
+  //     console.error('Failed to export Excel:', error);
+  //   }
+  // };
 
   const downloadExcel = (buffer: Buffer) => {
     const blob = new Blob([buffer], { type: 'application/octet-stream' });
@@ -100,7 +100,7 @@ const ExcelTable: React.FC = () => {
   return (
     <div style={{ width: '80%', margin: '0 auto', backgroundColor: '#777' }}>
       <Table columns={columns} dataSource={data} />
-      <Button onClick={() => exportExcel()}>Export</Button>
+      {/* <Button onClick={() => exportExcel()}>Export</Button> */}
     </div>
   );
 };

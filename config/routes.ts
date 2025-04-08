@@ -1,1 +1,5 @@
-export default [{ path: '/excel', component: '@/pages/excel' }];
+export default [
+  { path: '/', component: '@/pages/index' },
+  { path: '/excel', component: '@/pages/excel' },
+  { path: '/test-render', component: '@/pages/test-render' },
+];
